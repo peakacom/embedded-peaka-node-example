@@ -1,7 +1,7 @@
-# Embedded Peaka Python Example
+# Embedded Peaka Node Example
 
-Sample python project to demonstrate Embedded Peaka UI integration and Peaka SQLAlchemy client usage.
-Project has backend and frontend implementations. Backend is implemented using Flask framework.
+Sample node / express project to demonstrate Embedded Peaka UI integration and Peaka node client usage.
+Project has backend and frontend implementations. Backend is implemented using Express framework.
 Frontend is implemented with vite, react, tailwind and radix-ui.
 
 You need to run backend and frontend together. Here is how you can do the setup for both of them:
