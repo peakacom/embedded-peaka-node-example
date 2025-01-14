@@ -9,7 +9,7 @@ import {
 } from "@radix-ui/themes";
 import { useState } from "react";
 
-const BASE_URL = "https://vercel-node-chi-ten.vercel.app/";
+const BASE_URL = "https://vercel-node-chi-ten.vercel.app";
 
 function App() {
   const [step, setStep] = useState(0);
