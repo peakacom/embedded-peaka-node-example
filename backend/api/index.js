@@ -4,12 +4,12 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var indexRouter = require('../routes/index');
+var indexRouter = require('./routes/index');
 const cors = require('cors');
 require('dotenv').config()
 
 const corsOptions = {
-  origin: 'https://localhost:5173',
+  origin: 'https://embedded-peaka-node-example-5p71.vercel.app',
   optionsSuccessStatus: 200,
 };
 
