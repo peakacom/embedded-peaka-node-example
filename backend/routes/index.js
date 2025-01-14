@@ -23,12 +23,15 @@ const createPeakaProject = async (projectName) => {
 }
 
 const initPeakaSession = async (apiKey) => {
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,{
+  
+  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession?${new URLSearchParams({
+    projectId: apiKey
+}).toString()}`,{
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": `Bearer ${apiKey}`,
-    }
+      "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
+    },
   });
   return resp.json()
 }
@@ -54,7 +57,9 @@ router.get('/create-peaka-project', function(req, res, next) {
   const projectName = idGenerator();
   createPeakaProject(projectName).then(data => {
     const peakaProjectId = data.id;
+    console.log("peakaProjectId", data)
     createApiKey(peakaProjectId, projectName).then(keyData => {
+      console.log("res", keyData)
       res.send({projectName: projectName, projectId: peakaProjectId, projectApiKey: keyData.apiKey})
     });
   });
@@ -62,7 +67,8 @@ router.get('/create-peaka-project', function(req, res, next) {
 
 router.post('/connect', function(req, res, next){
   const apiKey = req.body.apiKey;
-  initPeakaSession(apiKey).then(data => {
+  const projectId = req.body.projectId
+  initPeakaSession(projectId).then(data => {
     console.log(data)
     res.send({sessionUrl: data.sessionUrl})
   })
@@ -71,7 +77,7 @@ router.post('/connect', function(req, res, next){
 router.post("/get-data", async function(req,res,next){
   const {apiKey, catalogName, schemaName, tableName} = req.body;
   try{
-    const connection = connectToPeaka(apiKey);
+    const connection = connectToPeaka(apiKey, {host: "https://test.peaka.host"});
     const iter = await connection.query(
       `select * from "${catalogName}"."${schemaName}"."${tableName}" limit 100`
     );
@@ -90,6 +96,7 @@ router.post("/get-data", async function(req,res,next){
     }
     res.send(JSON.stringify(data[0]));
   }catch(e){
+    console.log("e", e)
     throw Error("Error while getting data")
   }
 })
