@@ -9,7 +9,7 @@ const cors = require('cors');
 require('dotenv').config()
 
 const corsOptions = {
-  origin: 'https://embedded-peaka-node-example-5p71.vercel.app',
+  origin: '*',
   optionsSuccessStatus: 200,
 };
 
