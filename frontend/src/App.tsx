@@ -9,7 +9,7 @@ import {
 } from "@radix-ui/themes";
 import { useState } from "react";
 
-const BASE_URL = "http://localhost:3001";
+const BASE_URL = "https://embedded-peaka-node-example.vercel.app";
 
 function App() {
   const [step, setStep] = useState(0);
