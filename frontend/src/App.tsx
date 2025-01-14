@@ -15,14 +15,17 @@ function App() {
   const [step, setStep] = useState(0);
   const [isFetching, setIsFetching] = useState(false);
   const [projectName, setProjectName] = useState("");
+  const [projectId, setProjectId] = useState();
   const [projectAPIKey, setProjectAPIKey] = useState("");
   const [catalogName, setCatalogName] = useState("");
   const [schemaName, setSchemaName] = useState("");
   const [tableName, setTableName] = useState("");
   const [result, setResult] = useState<{ [key: string]: unknown }>({});
+  const [iframeUrl, setIframeUrl] = useState<string | undefined>();
+  const [isNewTab, setIsNewTab] = useState<boolean|undefined>();
 
   return (
-    <div className="w-full h-full flex flex-col justify-center items-center mt-96 gap-8">
+    <div className="w-full h-full flex flex-col justify-center items-center gap-8">
       <Heading>Welcome to Embedded Peaka Demo Project.</Heading>
       <Blockquote>
         First create a Peaka Project by clicking Create Project button.
@@ -36,6 +39,7 @@ function App() {
             const respJSON = await response.json();
             setProjectAPIKey(respJSON.projectApiKey);
             setProjectName(respJSON.projectName);
+            setProjectId(respJSON.projectId)
             setStep(1);
             setIsFetching(false);
           }
@@ -63,8 +67,10 @@ function App() {
                 disabled={isFetching}
                 onClick={async () => {
                   setIsFetching(true);
+                  setIsNewTab(true)
                   const data = {
                     apiKey: projectAPIKey,
+                    projectId: projectId
                   };
                   const response = await fetch(`${BASE_URL}/connect`, {
                     method: "POST",
@@ -84,14 +90,40 @@ function App() {
                   }
                 }}
               >
-                Connect
+                Connect Peaka UI in new tab
+              </Button>
+              <Button
+                disabled={isFetching}
+                style={{marginLeft:"0.5rem"}}
+                onClick={async () => {
+                  setIsNewTab(false)
+                  setIsFetching(true);
+                  const data = {
+                    apiKey: projectAPIKey,
+                    projectId: projectId
+                  };
+                  const response = await fetch(`${BASE_URL}/connect`, {
+                    method: "POST",
+                    headers: {
+                      "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(data),
+                  });
+                  if (response.ok) {
+                    const respJSON = await response.json();
+                    setIframeUrl(respJSON.sessionUrl);
+                    setIsFetching(false);
+                  }
+                }}
+              >
+                Connect Peaka UI in an iframe
               </Button>
             </div>
           </div>
         </>
       )}
 
-      {(step === 2 || step === 3) && (
+      {((step === 2 || step === 3) && isNewTab) && (
         <>
           <Blockquote>
             Enter catalog name and schema name and click Get Data button.
@@ -160,7 +192,7 @@ function App() {
           </div>
         </>
       )}
-      {step === 3 && (
+      {step === 3 && isNewTab && (
         <>
           <Blockquote>
             Successfully got the data. Showing sample data 1 row and 10 columns.
@@ -183,6 +215,14 @@ function App() {
             </Table.Body>
           </Table.Root>
         </>
+      )}
+
+      {iframeUrl && !isNewTab && (
+        <iframe
+          src={`${iframeUrl}`}
+          width={"100%"}
+          style={{height: "100vh"} }
+        />
       )}
     </div>
   );
