@@ -24,14 +24,20 @@ const createPeakaProject = async (projectName) => {
 
 const initPeakaSession = async (apiKey) => {
   
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession?${new URLSearchParams({
-    projectId: apiKey
-}).toString()}`,{
-    method: "GET",
+  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,{
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
     },
+    body: JSON.stringify({
+      projectId: apiKey,
+      themeOverride: false,
+      featureFlags: {
+        queries: false,
+        createDataInPeaka: false
+      }
+    })
   });
   return resp.json()
 }
