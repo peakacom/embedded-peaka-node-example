@@ -24,7 +24,7 @@ function App() {
   const [iframeUrl, setIframeUrl] = useState<string | undefined>();
   const [isNewTab, setIsNewTab] = useState<boolean | undefined>();
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  const [theme, setTheme] = useState<string>("light");
+  const [theme, setTheme] = useState<string>("dark");
   const [partnerOrigin, setPartnerOrigin] = useState<string>("");
 
   return (
