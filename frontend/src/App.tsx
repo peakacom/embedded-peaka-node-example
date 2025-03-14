@@ -230,6 +230,7 @@ function App() {
         {iframeUrl && !isNewTab && (
           <Button
             onClick={() => {
+              console.log("iframe")
               iframeRef.current?.contentWindow?.postMessage(
                 {
                   theme,
