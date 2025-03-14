@@ -77,7 +77,7 @@ router.post('/connect', function(req, res, next){
   const projectId = req.body.projectId
   initPeakaSession(projectId).then(data => {
     console.log(data)
-    res.send({sessionUrl: data.sessionUrl})
+    res.send({sessionUrl: data.sessionUrl, partnerOrigin: data.partnerOrigin})
   })
 })
 
