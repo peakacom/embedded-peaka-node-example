@@ -7,7 +7,7 @@ import {
   Heading,
   Table,
 } from "@radix-ui/themes";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 const BASE_URL = "https://vercel-node-chi-ten.vercel.app";
 
@@ -23,6 +23,9 @@ function App() {
   const [result, setResult] = useState<{ [key: string]: unknown }>({});
   const [iframeUrl, setIframeUrl] = useState<string | undefined>();
   const [isNewTab, setIsNewTab] = useState<boolean | undefined>();
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+  const [theme, setTheme] = useState<string>("light");
+  const [partnerOrigin, setPartnerOrigin] = useState<string>("");
 
   return (
     <div
@@ -119,6 +122,7 @@ function App() {
                       const respJSON = await response.json();
                       setIframeUrl(respJSON.sessionUrl);
                       setIsFetching(false);
+                      setPartnerOrigin(respJSON.partnerOrigin);
                     }
                   }}
                 >
@@ -223,6 +227,25 @@ function App() {
             </Table.Root>
           </>
         )}
+        {iframeUrl && !isNewTab && (
+          <Button
+            onClick={() => {
+              iframeRef.current?.contentWindow?.postMessage(
+                {
+                  theme,
+                  themeOverride: false,
+                },
+                partnerOrigin
+              );
+              setTheme(
+                theme === "light" ? "dark" : theme === "dark" ? "light" : ""
+              );
+              //console.log("address", iframeRef.current?.contentWindow?.document)
+            }}
+          >
+            Toggle Theme
+          </Button>
+        )}
       </div>
       <div
         className="w-full border-1 border-left p-10"
@@ -234,7 +257,8 @@ function App() {
           <iframe
             src={`${iframeUrl}`}
             width={"100%"}
-            style={{ height: "calc(100vh - 5rem)" }}
+            ref={iframeRef}
+            style={{ height: "calc(100vh - 5rem)", border: "1px solid #ededed" }}
           />
         )}
       </div>
