@@ -74,7 +74,7 @@ function App() {
                 <Text>Project API Key</Text>
                 <TextField.Root size="3" disabled value={projectAPIKey} />
               </Box>
-              <div className="mt-6">
+              <div className="mt-6 flex flex-col gap-4">
                 <Button
                   disabled={isFetching}
                   onClick={async () => {
