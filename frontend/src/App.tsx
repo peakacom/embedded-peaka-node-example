@@ -34,7 +34,10 @@ function App() {
         height: "100vh",
       }}
     >
-      <div className="flex flex-col justify-start items-center py-20 px-10 gap-8">
+      <div className="flex flex-col justify-start items-center py-20 px-10 gap-8" style={{
+        maxWidth: "300px",
+        overflow: "auto"
+      }}>
         <Heading>Welcome to Embedded Peaka Demo Project.</Heading>
         <Blockquote>
           First create a Peaka Project by clicking Create Project button.
@@ -99,7 +102,7 @@ function App() {
                     }
                   }}
                 >
-                  Connect Peaka UI in new tab
+                  Connect with new tab
                 </Button>
                 <Button
                   disabled={isFetching}
@@ -126,7 +129,7 @@ function App() {
                     }
                   }}
                 >
-                  Connect Peaka UI in an iframe
+                  Connect with an iframe
                 </Button>
               </div>
             </div>
