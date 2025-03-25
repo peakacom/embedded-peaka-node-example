@@ -9,7 +9,7 @@ export default defineConfig({
   server: {
     open: true,
     host: "localhost",
-    port: 5173,
+    port: 4002,
     ...(HTTPS
       ? {
           https: {

@@ -24,14 +24,17 @@ const createPeakaProject = async (projectName) => {
 
 const initPeakaSession = async (apiKey) => {
   
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession?${new URLSearchParams({
-    projectId: apiKey
-}).toString()}`,{
-    method: "GET",
+  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,{
+    method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
     },
+    body: JSON.stringify({
+      projectId: apiKey,
+      theme: "myDark",
+      themeOverride: false
+    })
   });
   return resp.json()
 }
@@ -70,7 +73,7 @@ router.post('/connect', function(req, res, next){
   const projectId = req.body.projectId
   initPeakaSession(projectId).then(data => {
     console.log(data)
-    res.send({sessionUrl: data.sessionUrl})
+    res.send({sessionUrl: data.sessionUrl, partnerOrigin: data.partnerOrigin})
   })
 })
 
