@@ -9,7 +9,7 @@ const cors = require('cors');
 require('dotenv').config()
 
 const corsOptions = {
-  origin: 'http://localhost:4002',
+  origin: 'http://localhost:5173',
   optionsSuccessStatus: 200,
 };
 
