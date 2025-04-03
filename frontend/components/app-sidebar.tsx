@@ -20,7 +20,7 @@ import { usePathname } from "next/dist/client/components/navigation"
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const path = usePathname();
   console.log("path", path)
-  const [data, setData] = React.useState({
+  const [data] = React.useState({
     navMain: [
       {
         title: "Sales",

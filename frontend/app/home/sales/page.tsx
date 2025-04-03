@@ -16,7 +16,7 @@ export default function Page() {
       theme: theme,
       themeOverride: false
     };
-    const response = fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
