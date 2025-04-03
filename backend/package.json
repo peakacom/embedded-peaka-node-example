@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node api/index.js",
+    "start": "node ./bin/www",
     "server": "nodemon api/index.js"
   },
   "dependencies": {
