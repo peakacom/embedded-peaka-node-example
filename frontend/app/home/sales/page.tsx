@@ -47,7 +47,7 @@ export default function Page() {
             src={`${iframeUrl}`}
             width={"100%"}
             ref={iframeRef}
-            style={{ height: "calc(100vh - 5rem)" }}
+            style={{height: "calc(100vh - 64px - 4rem)"}}
           />
         )}
       </div>
