@@ -1,27 +1,8 @@
-var {connectToPeaka} = require("@peaka/client")
-
 var express = require('express');
 var router = express.Router();
 
-const idGenerator = () => {
-  return Math.random().toString(36).slice(6).toUpperCase()
-}
-
-const createPeakaProject = async (projectName) => {
-  const data = {
-    name: projectName
-  }
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/projects`,{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
-    },
-    body: JSON.stringify(data),
-  });
-  return resp.json()
-}
-
+// Initialize a Peaka session with the provided parameters
+// Sends a POST request to initiate a session for the given project with specific themes and feature flags.
 const initPeakaSession = async (apiKey, theme, themeOverride, featureFlags) => {
   
   const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,{
@@ -40,22 +21,7 @@ const initPeakaSession = async (apiKey, theme, themeOverride, featureFlags) => {
   return resp.json()
 }
 
-
-const createApiKey = async (projectId, projectName) => {
-  const data = {
-    name: projectName
-  }
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/projects/${projectId}/apiKeys`,{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
-    },
-    body: JSON.stringify(data), // body data type must match "Content-Type" header
-  });
-  return resp.json()
-}
-
+// Middleware to authenticate token in request headers.
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   
@@ -63,7 +29,7 @@ const authenticateToken = (req, res, next) => {
     return res.status(403).json({ message: "Auth Error!" });
   }
 
-  const token = authHeader.split(" ")[1]; // "Bearer fake-token-xxx" formatını işler
+  const token = authHeader.split(" ")[1]; // Handles the "Bearer fake-token-xxx" format.
 
   if (!token.startsWith("fake-token-")) {
     return res.status(401).json({ message: "Invalid token!" });
@@ -72,27 +38,30 @@ const authenticateToken = (req, res, next) => {
   next();
 };
 
+// Sample user data with username, password, and role.
 const USERS = [
   { username: "admin", password: "admin", role: "admin" },
   { username: "user", password: "user", role: "user" },
 ];
 
+// POST route to handle user login.
 router.post("/api/login", (req, res) => {
   const { username, password } = req.body;
 
+  // Find the user matching the given username and password.
   const user = USERS.find((u) => u.username === username && u.password === password);
   
   if (!user) {
     return res.status(401).json({ message: "Wrong username or password" });
   }
 
-  const token = `fake-token-${Date.now()}`;
+  const token = `fake-token-${Date.now()}`; // Generate a fake token with the current timestamp.
   
   res.json({ token, role: user.role });
 });
 
 
-
+// POST route to connect to Peaka service and initialize a session.
 router.post('/connect', authenticateToken, function(req, res, next){
   const projectId = req.body.projectId
   const theme = req.body.theme ?? "dark"
@@ -108,49 +77,11 @@ router.post('/connect', authenticateToken, function(req, res, next){
     featureFlags.createDataInPeaka = false
   }
 
+  // Initialize Peaka session with provided configurations.
   initPeakaSession(projectId, theme, themeOverride, featureFlags).then(data => {
     console.log(data)
     res.send({sessionUrl: data.sessionUrl, partnerOrigin: data.partnerOrigin})
   })
-})
-
-router.get('/create-peaka-project', authenticateToken, function(req, res, next) {
-  const projectName = idGenerator();
-  createPeakaProject(projectName).then(data => {
-    const peakaProjectId = data.id;
-    console.log("peakaProjectId", data)
-    createApiKey(peakaProjectId, projectName).then(keyData => {
-      console.log("res", keyData)
-      res.send({projectName: projectName, projectId: peakaProjectId, projectApiKey: keyData.apiKey})
-    });
-  });
-});
-
-router.post("/get-data", authenticateToken, async function(req,res,next){
-  const {apiKey, catalogName, schemaName, tableName} = req.body;
-  try{
-    const connection = connectToPeaka(apiKey, {host: "https://test.peaka.host"});
-    const iter = await connection.query(
-      `select * from "${catalogName}"."${schemaName}"."${tableName}" limit 100`
-    );
-    const data = []
-    for await (const queryResult of iter) {
-      let result = {};
-      await queryResult.data?.forEach(async (item, index) => {
-        if(Array.isArray(item)){
-          await item.forEach((datum, i) => {
-            result[queryResult.columns[i].name] = datum
-          })
-          data.push(result);
-        }
-      })
-      
-    }
-    res.send(JSON.stringify(data[0]));
-  }catch(e){
-    console.log("e", e)
-    throw Error("Error while getting data")
-  }
 })
 
 module.exports = router;
