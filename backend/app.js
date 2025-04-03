@@ -26,8 +26,20 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use((req, res, next) => {
+  console.log("dynamic")
+  const dynamicDomain = req.headers['origin'] || 'https://defaultdomain.com';
+  const cspHeader = `default-src 'self'; script-src 'self' ${dynamicDomain}; frame-ancestors 'self';`.trim();
+  
+  res.setHeader('Content-Security-Policy', cspHeader);
+  
+  next();
+});
 
 app.use('/', indexRouter);
+
+
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -42,7 +54,7 @@ app.use(function(err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render('error');
+  res.send(JSON.stringify(err));
 });
 
 module.exports = app;
