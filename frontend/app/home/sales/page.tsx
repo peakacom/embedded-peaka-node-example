@@ -12,11 +12,11 @@ export default function Page() {
 
   useEffect(() => {
     const data = {
-      projectId: process.env.NEXT_PUBLIC_MARKETING_APP_PROJECT_ID,
+      projectId: process.env.NEXT_PUBLIC_SALES_APP_PROJECT_ID,
       theme: theme,
       themeOverride: false
     };
-    const response = fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
