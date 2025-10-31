@@ -3,23 +3,43 @@ var router = express.Router();
 
 // Initialize a Peaka session with the provided parameters
 // Sends a POST request to initiate a session for the given project with specific themes and feature flags.
-const initPeakaSession = async (apiKey, theme, themeOverride, featureFlags) => {
-  
-  const resp = await fetch(`${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,{
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
-    },
-    body: JSON.stringify({
-      projectId: apiKey,
-      theme: theme,
-      themeOverride: themeOverride,
-      featureFlags
-    })
-  });
-  return resp.json()
-}
+const initPeakaSession = async (
+  apiKey,
+  theme,
+  themeOverride,
+  featureFlags,
+  featureConfigs,
+  connectorType,
+  catalogCreateEnabled
+) => {
+  const bodyObj = {
+    projectId: apiKey,
+    theme: theme,
+    sessionMode: connectorType ? "CONNECTOR_MODAL_ONLY" : "FULL_STUDIO",
+    themeOverride: themeOverride,
+    featureFlags,
+  };
+
+  if (connectorType) {
+    bodyObj.connectorType = connectorType;
+    bodyObj.catalogCreateEnabled = catalogCreateEnabled;
+  } else {
+    bodyObj.featureConfigs = featureConfigs;
+  }
+
+  const resp = await fetch(
+    `${process.env.PEAKA_PARTNER_API_BASE_URL}/ui/initSession`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${process.env.PEAKA_PARTNER_API_KEY}`,
+      },
+      body: JSON.stringify(bodyObj),
+    }
+  );
+  return resp.json();
+};
 
 // Middleware to authenticate token in request headers.
 const authenticateToken = (req, res, next) => {
@@ -62,26 +82,47 @@ router.post("/api/login", (req, res) => {
 
 
 // POST route to connect to Peaka service and initialize a session.
-router.post('/connect', authenticateToken, function(req, res, next){
-  const projectId = req.body.projectId
-  const theme = req.body.theme ?? "dark"
-  const themeOverride = req.body.themeOverride ?? false
-  const role = req.headers.role;
+router.post("/connect", authenticateToken, function (req, res, next) {
+  try {
+    const projectId = req.body.projectId;
+    const theme = req.body.theme ?? "dark";
+    const themeOverride = req.body.themeOverride ?? false;
+    const role = req.headers.role;
+    const connectorType = req.body.connectorType;
+    const catalogCreateEnabled = req.body.catalogCreateEnabled;
 
-  const featureFlags = {}
-  if(role === "user"){
-    featureFlags.queries = false
-    featureFlags.createDataInPeaka = false
-  }
-  if(role === "admin"){
-    featureFlags.createDataInPeaka = false
-  }
+    const featureConfigs = {
+      displayedConnectorTypes: [],
+    };
 
-  // Initialize Peaka session with provided configurations.
-  initPeakaSession(projectId, theme, themeOverride, featureFlags).then(data => {
-    console.log(data)
-    res.send({sessionUrl: data.sessionUrl, partnerOrigin: data.partnerOrigin})
-  })
-})
+    const featureFlags = {};
+    if (role === "user") {
+      featureFlags.queries = false;
+      featureFlags.createDataInPeaka = false;
+    }
+    if (role === "admin") {
+      featureFlags.createDataInPeaka = false;
+    }
+
+    // Initialize Peaka session with provided configurations.
+    initPeakaSession(
+      projectId,
+      theme,
+      themeOverride,
+      featureFlags,
+      featureConfigs,
+      connectorType,
+      catalogCreateEnabled
+    ).then((data) => {
+      console.log(data);
+      res.send({
+        sessionUrl: data.sessionUrl,
+        partnerOrigin: data.partnerOrigin,
+      });
+    });
+  } catch (e) {
+    console.log("e", e);
+  }
+});
 
 module.exports = router;
