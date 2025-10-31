@@ -32,6 +32,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         url: "/home/marketing",
         isActive: path === "/home/marketing",
       },
+      {
+        title: "Connectors",
+        url: "/home/connectors",
+        isActive: path === "/home/connectors",
+      },
     ],
   })
   return (
