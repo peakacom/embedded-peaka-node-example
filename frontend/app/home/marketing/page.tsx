@@ -16,7 +16,7 @@ export default function Page() {
       theme: theme,
       themeOverride: false
     };
-    const response = fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/connect`, {
       method: "POST",
       headers: getHeaders(),
       body: JSON.stringify(data),
@@ -47,7 +47,7 @@ export default function Page() {
             src={`${iframeUrl}`}
             width={"100%"}
             ref={iframeRef}
-            style={{height: "calc(100vh - 64px - 4rem)"}}
+            style={{ height: "calc(100vh - 64px - 4rem)" }}
           />
         )}
       </div>
