@@ -82,7 +82,7 @@ router.post("/api/login", (req, res) => {
 
 
 // POST route to connect to Peaka service and initialize a session.
-router.post("/connect", authenticateToken, function (req, res, next) {
+router.post('/connect', authenticateToken, function(req, res, next){
   try {
     const projectId = req.body.projectId;
     const theme = req.body.theme ?? "dark";
@@ -114,7 +114,6 @@ router.post("/connect", authenticateToken, function (req, res, next) {
       connectorType,
       catalogCreateEnabled
     ).then((data) => {
-      console.log(data);
       res.send({
         sessionUrl: data.sessionUrl,
         partnerOrigin: data.partnerOrigin,
@@ -123,6 +122,6 @@ router.post("/connect", authenticateToken, function (req, res, next) {
   } catch (e) {
     console.log("e", e);
   }
-});
+})
 
 module.exports = router;
